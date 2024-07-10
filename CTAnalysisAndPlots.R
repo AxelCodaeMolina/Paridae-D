@@ -143,6 +143,16 @@ summarySE <- function(data = NULL, measurevar, groupvars = NULL, na.rm = FALSE, 
 
 # Calculate summary and create plots ####
 
+# Modify the Treatment column
+data <- data %>%
+  mutate(Treatment = recode(Treatment, "CONTROL CONTROL" = "Non-mobbing"))
+
+data_ct_mob <- data_ct_mob %>%
+  mutate(Treatment = recode(Treatment, "CONTROL CONTROL" = "Non-mobbing"))
+
+data_other_mob <- data_other_mob %>%
+  mutate(Treatment = recode(Treatment, "CONTROL CONTROL" = "Non-mobbing"))
+
 # Colors
 viridis_palette <- viridis(9)
 custom_colors <- c(
@@ -158,7 +168,7 @@ custom_colors <- c(
 )
 
 # Function to create plots for binary outcomes
-create_binary_plot <- function(data, measurevar, title, y_label) {
+create_binary_plot <- function(data, measurevar, y_label) {
   tgc <- summarySE(data, measurevar = measurevar, groupvars = "Treatment")
   
   ggplot(tgc, aes(x = Treatment, y = .data[[measurevar]])) +
@@ -167,12 +177,12 @@ create_binary_plot <- function(data, measurevar, title, y_label) {
                   width = 0.2, position = position_dodge(0.6)) +
     scale_color_manual(values = custom_colors) +
     theme_minimal() +
-    labs(title = title, x = "Palyback treatment", y = y_label) +
+    labs (x = "Playback treatment", y = y_label) +
     theme(legend.position = "none")
 }
 
 # Function to create plots for count outcomes
-create_count_plot <- function(data, measurevar, title, y_label) {
+create_count_plot <- function(data, measurevar, y_label) {
   tgc <- summarySE(data, measurevar = measurevar, groupvars = "Treatment")
   
   ggplot(data, aes(x = Treatment, y = .data[[measurevar]])) +
@@ -182,26 +192,26 @@ create_count_plot <- function(data, measurevar, title, y_label) {
                   colour = "black", width = 0.05, position = position_dodge(0.6)) +
     geom_point(data = tgc, position = position_dodge(width = 0.6)) +
     theme_minimal() +
-    labs(title = title, x = "Palyback treatment", y = y_label)
+    labs(x = "Playback treatment", y = y_label)
 }
 
 # Plots for binary outcomes
-p_MobCT <- create_binary_plot(data, "MobCT", "Presence of mobbing coal tits", "Proportion of mobbing coal tits")
+p_MobCT <- create_binary_plot(data, "MobCT", "Proportion of mobbing coal tits")
 print(p_MobCT)
 ggsave(filename = "p_MobCT.png", plot = p_MobCT, width = 8, height = 6, bg = "white")
 
-p_MobOther <- create_binary_plot(data, "MobOther", "Presence of other mobbing birds", "Proportion of mobbing non-coal tits birds")
+p_MobOther <- create_binary_plot(data, "MobOther", "Proportion of mobbing non-coal tits birds")
 print(p_MobOther)
 ggsave(filename = "p_MobOther.png", plot = p_MobOther, width = 8, height = 6, bg = "white")
 
 
 # Plots for count outcomes
-p_Number_CT_Mob <- create_count_plot(data_ct_mob, "Number_CT_Mob", "Number of mobbing coal tits", "Number of mobbing coal tits")
+p_Number_CT_Mob <- create_count_plot(data_ct_mob, "Number_CT_Mob", "Number of mobbing coal tits")
 print(p_Number_CT_Mob)
 ggsave(filename = "p_Number_CT_Mob.png", plot = p_Number_CT_Mob, width = 8, height = 6, bg = "white")
 
 
-p_Number_Other_Mob <- create_count_plot(data_other_mob, "Number_Other_Mob", "Number of other mobbing birds", "Number of mobbing non-coal tits birds")
+p_Number_Other_Mob <- create_count_plot(data_other_mob, "Number_Other_Mob", "Number of mobbing non-coal tits birds")
 print(p_Number_Other_Mob)
 ggsave(filename = "p_Number_Other_Mob.png", plot = p_Number_Other_Mob, width = 8, height = 6, bg = "white")
 
